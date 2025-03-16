@@ -1,8 +1,9 @@
+import { CLUB, DIAMOND, HEART, SPADE } from "./constants";
 import { Card } from "./Card";
 import { Deck } from "./Deck";
 import { DiscardPile } from "./DiscardPile";
 import { Player } from "./Player";
-import { CLUB, DIAMOND, HEART, SPADE } from "./constants";
+import { Suits } from "./Suits";
 
 export class BotPlayer extends Player {
 
@@ -49,20 +50,24 @@ export class BotPlayer extends Player {
         }
     }
 
-    private analyzeHand(): void {
-        const hearts: Card[] = this.getCardBySuit(HEART)
-        const clubs: Card[] = this.getCardBySuit(CLUB)
-        const diamonds: Card[] = this.getCardBySuit(DIAMOND)
-        const spades: Card[] = this.getCardBySuit(SPADE)
+    private canMeld(suits: Suits): boolean {
+        for(const suit of suits) {
+            for(let i = 0; i < suit.length - 2; i++) {
+                if(suit[i].rank === suit[i+1].rank+1 && suit[i].rank === suit[i+2].rank+2) {
+                    return true
+                }
+            }
+        }
 
-        const cardsBySuit: Array<Card[]> = [hearts, clubs, diamonds, spades]
-
-        cardsBySuit.forEach(cards => {
-            this.assignWeights(cards)
-        })
-
-        console.log('sds')
+        return false
     }
+
+    private meld(): void {
+        // implement me!
+    }
+
+
+
 
     public exchangeCard(): void {
         
@@ -70,6 +75,24 @@ export class BotPlayer extends Player {
 
     public play(): void {
         this.draw();
-        this.analyzeHand();
+
+        // Assign weights to cards in hand
+        const hearts: Card[] = this.getCardBySuit(HEART)
+        const clubs: Card[] = this.getCardBySuit(CLUB)
+        const diamonds: Card[] = this.getCardBySuit(DIAMOND)
+        const spades: Card[] = this.getCardBySuit(SPADE)
+
+        const cardsBySuit: Suits = [hearts, clubs, diamonds, spades]
+
+        cardsBySuit.forEach(cards => {
+            this.assignWeights(cards)
+        })
+
+        if(this.canMeld(cardsBySuit)) {
+
+        }else {
+
+        }
+
     }
 }

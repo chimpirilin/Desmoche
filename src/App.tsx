@@ -1,8 +1,8 @@
-import { Game } from "./models/Game"
+import { GameModel } from "./models/Game"
 import { PlayerStatus } from "./component/PlayerStatus"
 
 function App() {
-    const game : Game = new Game(4)
+    const game : GameModel = new GameModel(4)
 
     return (
         <div>

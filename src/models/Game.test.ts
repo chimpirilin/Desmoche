@@ -1,7 +1,7 @@
 import {expect, test} from 'vitest'
-import { Game } from './GameModel'
+import { GameModel } from './Game'
 
-const game = new Game(2)
+const game = new GameModel(2)
 
 test('should create a game with 2 players', () => {
     expect(game).toBeDefined()

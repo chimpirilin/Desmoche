@@ -45,6 +45,10 @@ export class GameModel {
     private nextPlayer(): Player {
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this._players.length
         return this._players[this.currentPlayerIndex]
-    } 
+    }
+
+    public get players(): Player[] {
+        return this._players;
+    }
 }
 
