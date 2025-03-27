@@ -64,6 +64,7 @@ export class BotPlayer extends Player {
 
     private meld(): void {
         // implement me!
+        // get diagram!
     }
 
 

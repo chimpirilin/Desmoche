@@ -1,0 +1,75 @@
+.background {
+    background-color: #0d8055;
+    width: 100vw;
+    height: 100vh;
+    margin: 0 auto;
+}
+
+.game-area {
+    display: grid;
+    grid-template-columns: 15% 15% 40% 15% 15%;
+    grid-template-rows: 15% 15% 40% 15% 15%;
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    border: 2px solid #ffffff;
+}
+
+.card-container-TOP {
+    display: flex;
+    flex-direction: row;
+    gap: 0px 0px;
+    margin-top: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-container-BOTTOM {
+    display: flex;
+    flex-direction: row;
+    gap: 0px 0px;
+}
+
+.card-container-LEFT {
+    display: flex;
+    flex-direction: column;
+    column-gap: 0px;
+    margin-left: 50px;
+}
+
+.card-container-RIGHT {
+    display: flex;
+    flex-direction: column;
+    column-gap: 0px;
+    margin-left: 70px;
+
+}
+
+.card-VERTICAL {
+    height: 100px;
+    width: 66px;
+    margin-bottom: -70px;
+}
+
+.card-HORIZONTAL {
+    height: 100px;
+    width: 66px;
+    margin-right: -30px;
+}
+
+.card:last-child {
+    margin-right: 0px;
+}
+
+.card-TOP {
+}
+
+.card-LEFT {
+    transform: rotate(90deg);
+}
+
+.card-RIGHT {
+    transform: rotate(90deg);
+}
