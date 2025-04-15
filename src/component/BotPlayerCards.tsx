@@ -6,7 +6,7 @@ export function BotPlayerCards({position}: {position: PlayerPosition}) : JSX.Ele
      return (
         <div className={`card-container-${PlayerPosition[position]}`}>
             {Array.from({ length: 9 }).map((_, index) => (
-                <img key={index} src={`./src/assets/cards/face_down_vertical.svg`}  className={`card-${CardsOrientation[orientation]} card-${PlayerPosition[position]}`} />
+                <img key={index} src={`./src/assets/cards/face_down_vertical.svg`} className={`card-${CardsOrientation[orientation]} card-${PlayerPosition[position]}`} />
             ))}
         </div>
      ) 
