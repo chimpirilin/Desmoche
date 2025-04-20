@@ -22,3 +22,6 @@ export enum CardsOrientation {
     VERTICAL,
     HORIZONTAL
 }
+
+export const CARDS_ON_HAND = 9
+export const CARDS_ON_DECK_AFTER_DEALING = 16

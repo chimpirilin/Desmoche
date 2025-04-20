@@ -1,6 +1,7 @@
 import { PlayerPosition } from '../models/constants'
-import { BotMeldsPile } from './BotMeldsPile'
-import { BotPlayerCards } from './BotPlayerCards'
+import { PlayerCards } from './PlayerCards'
+import { MeldsPile } from './MeldsPile'
+import { DeckAndDiscardPile } from './DeckAndDiscardPile'
 import './GameArea.css'
 
 export function GameArea() {
@@ -9,27 +10,27 @@ export function GameArea() {
             <div className="game-area">
                 <div></div>
                 <div></div>
-                <BotPlayerCards position={PlayerPosition.TOP} />
+                <PlayerCards position={PlayerPosition.TOP} />
                 <div></div>
                 <div></div>
                 <div></div>
                 <div></div>
-                <BotMeldsPile position={PlayerPosition.TOP} />
+                <MeldsPile position={PlayerPosition.TOP} />
                 <div></div>
                 <div></div>
-                <BotPlayerCards position={PlayerPosition.LEFT} />
-                <BotMeldsPile position={PlayerPosition.LEFT} />
-                <div></div>
-                <BotMeldsPile position={PlayerPosition.RIGHT} />
-                <BotPlayerCards position={PlayerPosition.RIGHT} />
-                <div></div>
-                <div></div>
+                <PlayerCards position={PlayerPosition.LEFT} />
+                <MeldsPile position={PlayerPosition.LEFT} />
+                <DeckAndDiscardPile />
+                <MeldsPile position={PlayerPosition.RIGHT} />
+                <PlayerCards position={PlayerPosition.RIGHT} />
                 <div></div>
                 <div></div>
-                <div></div>
+                <MeldsPile position={PlayerPosition.BOTTOM} />
                 <div></div>
                 <div></div>
                 <div></div>
+                <div></div>
+                <PlayerCards position={PlayerPosition.BOTTOM} />
                 <div></div>
                 <div></div>
             </div>
