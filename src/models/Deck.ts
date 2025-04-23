@@ -11,7 +11,7 @@ export class Deck {
     private createDeck(): void {
         for (const suit of DECK_COMPONENTS.suits) {
             for (const rank of DECK_COMPONENTS.values) {
-                this.deck.push({ suit, rank })
+                this.deck.push({ suit, rank, weight: Infinity })
             }
         }
     }

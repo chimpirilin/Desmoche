@@ -4,7 +4,7 @@ import { DiscardPile } from "./DiscardPile";
 import { MeldPile } from "./MeldPile";
 
 import { INITIAL_HAND_SIZE, MELD_PILES_SIZE } from "./constants";
-
+//TODO: revise public methods to be private or protected
 export abstract class Player {
     private _hand: Card[] = []
     private _meldPiles: MeldPile[] = []

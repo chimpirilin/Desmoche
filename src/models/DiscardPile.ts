@@ -4,8 +4,12 @@ import { Card } from "./Card"
 export class DiscardPile {
     private pile: Card[] = []
 
-    private isPileEmpty(): boolean {
-        return this.pile.length === 0
+    public isPileEmpty(): boolean {
+        return this.cardsLeft() === 0
+    }
+
+    public cardsLeft(): number {
+        return this.pile.length
     }
 
     public addCardToTop(card: Card): void {
@@ -21,9 +25,8 @@ export class DiscardPile {
     }
 
     public removeTopCard(): void {
-        if(this.isPileEmpty()) {
-            throw new Error('Cannot remove top card, pile is empty!')
+        if(!this.isPileEmpty()) {
+            this.pile.pop()
         }
-        this.pile.pop()
     } 
 }

@@ -29,6 +29,14 @@ export class MeldPile {
         return ""
     }
 
+    public cardsInPile(): number {
+        return this._pile.length
+    }
+
+    public isEmpty(): boolean {
+        return this.cardsInPile() === 0
+    }
+
     get pile(): Card[] {
         return this._pile
     }
