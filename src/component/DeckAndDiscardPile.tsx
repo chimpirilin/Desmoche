@@ -10,6 +10,7 @@ export function DeckAndDiscardPile() : JSX.Element {
                     style={{
                         left: `${index * stackingOffset}px`,
                         top: `${index * stackingOffset}px`,
+                        zIndex: `${index}`,
                     }}
                     />
                 ))}
