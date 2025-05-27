@@ -6,7 +6,7 @@ export function DeckAndDiscardPile() : JSX.Element {
         <div>
             <div className={`deck-container`}>
                 {Array.from({ length: CARDS_ON_DECK_AFTER_DEALING }).map((_, index) => (
-                    <img key={index} src={`./src/assets/cards/face_down_vertical.svg`} className={`deck-card`} 
+                    <img id={`deck-card-${index+1}`} key={index} src={`./src/assets/cards/face_down_vertical.svg`} className={`deck-card`} 
                     style={{
                         left: `${index * stackingOffset}px`,
                         top: `${index * stackingOffset}px`,

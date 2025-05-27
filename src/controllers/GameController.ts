@@ -11,24 +11,8 @@ export class GameController {
     // NOTE: we might not need a controller
     // event handlers should be enough
 
-    private suscribeToEvents() {
-        const eventBus = new GameEventBus()
-        eventBus.onDrawCard((data) => {
-            console.log("Card drawn:", data.cardId);
-            // Handle card drawn event
-        });
-        eventBus.onDiscardCard((data) => {
-            console.log("Card discarded:", data.index);
-            // Handle card discarded event
-        });
-
-        eventBus.onGameStarted(() => {
-            console.log("Game started");
-            this.play();
-        });
+    public isFirstPlay() {
+        return this.gameModel.isFirstPlay() 
     }
-   
-    public play() {
 
-    }
 }

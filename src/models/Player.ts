@@ -11,7 +11,7 @@ export abstract class Player {
     private _isFirstTurn: boolean = false
     private _isFirstPlayer: boolean = false
 
-    constructor(private deck: Deck, private discardPile : DiscardPile, private _name: string = 'Player') {
+    constructor(private deck: Deck, protected discardPile : DiscardPile, private _name: string = 'Player') {
         this.initializeHand();
 
         for(let i = 0; i < MELD_PILES_SIZE; i++) {
@@ -26,7 +26,7 @@ export abstract class Player {
 
     private initializeHand(): void {
         for(let i = 0; i < INITIAL_HAND_SIZE; i++) {
-            this.draw()
+            this.drawFromDeck()
         }
     }
 
@@ -34,8 +34,9 @@ export abstract class Player {
         this._hand.splice(cardIndex, 1);
     }
 
-    public draw(): void {
+    public drawFromDeck(): void {
         if(this.deck.cardsLeft() === 0) {
+            // we probably want to emit an event instead of throwing
             throw new Error('Cannot draw, deck is empty!');
         }
         this.addToHand(this.deck.getRandomCardAndRemoveItFromDeck());

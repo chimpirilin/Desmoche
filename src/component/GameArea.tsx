@@ -1,3 +1,7 @@
+import { useEffect } from 'react'
+
+import { drawFromDeckAnimation } from '../animations/deck'
+
 import { PlayerPosition } from '../models/constants'
 import { PlayerCards } from './PlayerCards'
 import { MeldsPile } from './MeldsPile'
@@ -5,6 +9,15 @@ import { DeckAndDiscardPile } from './DeckAndDiscardPile'
 import './GameArea.css'
 
 export function GameArea() {
+
+    useEffect(() => {
+        const runAnimation = async () => {
+            await drawFromDeckAnimation()
+        }
+        runAnimation()
+
+    }, [])
+
     return (
         <div className="background">
             <div className="game-area">
@@ -37,6 +50,5 @@ export function GameArea() {
         </div>
     )
 }
-    
 
-    
+

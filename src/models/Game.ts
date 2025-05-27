@@ -4,8 +4,6 @@ import { HumanPlayer } from "./HumanPlayer"
 import { DiscardPile } from "./DiscardPile"
 import { Player } from "./Player"
 
-import { GameEventBus } from "../events/GameEventBus"
-
 export class GameModel {
     private botPlayers: BotPlayer[] = []
     // private humanPlayer: HumanPlayer
@@ -13,10 +11,10 @@ export class GameModel {
     private _players: Player[]
     private deck: Deck
     private discardPile: DiscardPile
-    private currentPlayer: Player
+    private _currentPlayer: Player
     private currentPlayerIndex: number = 0
-
-    private eventEmitter: GameEventBus
+    private static _isFirstPlay: boolean = true
+    private round: number = 1
 
     constructor(private playerCount: number) {
         this.deck = new Deck()
@@ -32,9 +30,8 @@ export class GameModel {
         // uncomment this line to add the human player to the game
         // this._players = [this.humanPlayer, ...this.botPlayers]
         this._players = [...this.botPlayers]
-        this.currentPlayer = this.determineInitialPlayer()
+        this._currentPlayer = this.determineInitialPlayer()
 
-        this.eventEmitter = new GameEventBus
     }
 
     private determineInitialPlayer(): Player {
@@ -48,11 +45,24 @@ export class GameModel {
     }
 
     public get players(): Player[] {
-        return this._players;
+        return this._players
     }
 
-    public startGame() {
-        this.eventEmitter.emitGameStarted()
+    public get botPlayersList(): BotPlayer[] {
+        return this.botPlayers
+    }
+
+    public get currentPlayer(): Player {
+        return this._currentPlayer
+    }
+
+
+    public static setFirstPlayToFalse(): void {
+        GameModel._isFirstPlay = false
+    }
+
+    public static isFirstPlay() {
+        return this._isFirstPlay
     }
 }
 
