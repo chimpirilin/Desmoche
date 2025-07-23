@@ -6,45 +6,43 @@ import { Player } from '../models/Player';
 
 // TODO: should this FSM also handle an animation for game winner?
 
-async function botPlay(bot: any) {
+async function botPlay(bot: ReturnType<typeof createBotMachine>) {
     const botActor = createActor(bot)
     botActor.start()
     await toPromise(botActor)
 }
 
-
-type PlayerExpanded = {
+type PlayerAndMachine = {
     player: BotPlayer,
-    // machine: ReturnType<typeof createBotMachine>, // Do I need the machine?
-    actor: Actor<ReturnType<typeof createBotMachine>>
+    machine: ReturnType<typeof createBotMachine>, // Do I need the machine?
 }
 
 function createGameMachine(game: GameModel) {
 
     const initialPlayer: Player = game.currentPlayer
 
-    const botPlayers: PlayerExpanded[] = []
+    const botPlayers: PlayerAndMachine[] = []
     
-    const initialPlayerActor = createActor(createBotMachine(initialPlayer as BotPlayer))
+    const initialPlayerMachine = createBotMachine(initialPlayer as BotPlayer)
 
-    const initalPlayerExpanded: PlayerExpanded = {
+    const initalPlayerAndMachine: PlayerAndMachine = {
         player: initialPlayer as BotPlayer,
-        actor: initialPlayerActor
+        machine: initialPlayerMachine
     }
 
-    botPlayers.push(initalPlayerExpanded)
+    botPlayers.push(initalPlayerAndMachine)
 
     // Note below code is old, but might still be relevant
     // assumption: botMachines[0] is the inital player of the game
     // botMachines.push(createBotMachine(initialPlayer as BotPlayer))
     for(const botPlayer of game.botPlayersList) {
-        if(botPlayer.name === initalPlayerExpanded.player.name) continue
-        const playerActor = createActor(createBotMachine(botPlayer))
-        const playerExpanded: PlayerExpanded = {
+        if(botPlayer.name === initalPlayerAndMachine.player.name) continue
+        const playerMachine = createBotMachine(botPlayer)
+        const PlayerAndMachine: PlayerAndMachine = {
             player: botPlayer as BotPlayer,
-            actor: playerActor
+            machine: playerMachine
         }
-        botPlayers.push(playerExpanded)
+        botPlayers.push(PlayerAndMachine)
     }
 
     return setup({
@@ -52,34 +50,27 @@ function createGameMachine(game: GameModel) {
             setFirstPlayer: ({ context }) => {
                 context.currentPlayer = context.player1
             },
-            setNextPlayer: ({ context }) => {
-                context.currentPlayer = context.game.nextPlayer()
-            },
-            determineCurrentPlayer: ({ context }) => {
-                const botActor = [...botActorsMap]
-                const bot1 = (botActor[0][1].config.context as { bot: BotPlayer }).bot;
-                if(bot1.name === context.gameModel.currentPlayer.name ) {
+            setTheNextPlayer: ({ context }) => {
+                const nextPlayer = context.game.nextPlayer()
+
+                // player1.player, yikes!
+                if(nextPlayer.name === context.player1.player.name) {
                     context.currentPlayer = context.player1
                     return
                 }
-
-                const bot2 = (botMachines[1].config.context as { bot: BotPlayer }).bot;
-                if(bot2.name === context.gameModel.currentPlayer.name ) {
+                if(nextPlayer.name === context.player2.player.name) {
                     context.currentPlayer = context.player2
                     return
                 }
-                
-                const bot3 = (botMachines[2].config.context as { bot: BotPlayer }).bot;
-                if(bot3.name === context.gameModel.currentPlayer.name ) {
+                if(nextPlayer.name === context.player3.player.name) {
                     context.currentPlayer = context.player3
                     return
                 }
-
-                const bot4 = (botMachines[3].config.context as { bot: BotPlayer }).bot;
-                if(bot4.name === context.gameModel.currentPlayer.name ) {
+                if(nextPlayer.name === context.player4.player.name) {
                     context.currentPlayer = context.player4
                     return
                 }
+
             },
         },
         actors: {
@@ -96,25 +87,20 @@ function createGameMachine(game: GameModel) {
         initial: 'start',
         context: {
             // remember that player1 is the inital player of the game
-            player1: createActor(botMachines[0]),
-            player2: createActor(botMachines[1]),
-            player3: createActor(botMachines[2]),
-            player4: createActor(botMachines[3]),
+            player1: botPlayers[0],
+            player2: botPlayers[1],
+            player3: botPlayers[2],
+            player4: botPlayers[3],
             // the value assigned is a dummy placeholder
             // its purpose is to prevent TS from yelling at us
             // in setFirstPlayer guard
-            currentPlayer: createActor(botMachines[0]),
+            currentPlayer: botPlayers[0],
             gameModel: game
         },
         states: {
             start: {
                 always: [
-                    {actions: 'setFirstPlayer', target: 'determineTheCurrentPlayer'}
-                ]
-            },
-            determineTheCurrentPlayer: {
-                always: [
-                    {actions: 'determineCurrentPlayer', target: 'play'}
+                    {actions: 'setFirstPlayer', target: 'play'}
                 ]
             },
             play: {
@@ -125,20 +111,21 @@ function createGameMachine(game: GameModel) {
                         actions: () => console.log('turn ended')
                     },
                     input: {
-                        bot: ({context}: { context: { currentPlayer: Actor<any> } }) => context.currentPlayer
+                        // this is wrong, we need to send a machine and not an actor
+                        bot: ({context}: { context: { currentPlayer: PlayerAndMachine } }) => context.currentPlayer.machine
                     },
                     
                 }
             },
             setNextPlayer: {
                 always: [
-                    {actions: ''}
+                    {actions: 'setTheNextPlayer', target: 'play'}
                 ]
             },
             isMatchOver: {
                 always: [
                     {guard: 'isTheMatchOver', target: 'matchOver'},
-                    {target: }
+                    {target: 'play'} 
                 ]
             },
             matchOver: {
