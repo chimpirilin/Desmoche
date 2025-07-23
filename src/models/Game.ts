@@ -39,9 +39,16 @@ export class GameModel {
         return this._players[this.currentPlayerIndex]
     }
 
-    private nextPlayer(): Player {
+    public nextPlayer(): Player {
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this._players.length
         return this._players[this.currentPlayerIndex]
+    }
+
+    public matchOver(): boolean {
+        for(const player of this._players) {
+            if(player.isWinner()) return true
+        }
+        return false
     }
 
     public get players(): Player[] {
@@ -55,7 +62,6 @@ export class GameModel {
     public get currentPlayer(): Player {
         return this._currentPlayer
     }
-
 
     public static setFirstPlayToFalse(): void {
         GameModel._isFirstPlay = false

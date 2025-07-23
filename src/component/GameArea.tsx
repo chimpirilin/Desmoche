@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { drawFromDeckAnimation } from '../animations/deck'
+import { drawFromDeck } from '../animations/draw_from_deck'
 
 import { PlayerPosition } from '../models/constants'
 import { PlayerCards } from './PlayerCards'
@@ -12,7 +12,7 @@ export function GameArea() {
 
     useEffect(() => {
         const runAnimation = async () => {
-            await drawFromDeckAnimation()
+            await drawFromDeck()
         }
         runAnimation()
 

@@ -1,10 +1,27 @@
-import { createMachine } from 'xstate';
-import { GameController } from '../controllers/GameController';
+import { fromPromise, setup } from 'xstate';
 import { GameModel } from '../models/Game';
 import { BotPlayer } from '../models/BotPlayer';
 
+import { drawFromDeck } from '../animations/draw_from_deck';
+
 export function createBotMachine(bot: BotPlayer) {
-    return createMachine({
+    return setup({
+        actors: {
+            drawingFromDiscardPileAnimation: fromPromise(async () => {
+                await drawFromDeck()
+            })
+        },
+        guards: {
+            isFirstTurn: () => GameModel.isFirstPlay(),
+            isCardOnTopOfDiscardPileUseful: ({context}) => context.bot.isCardOnTopOfDiscardPileUseful(),
+            canMeld: ({context}) => context.bot.canMeld()
+        },
+        actions: {
+            setFirstTurnToFalse: () => {
+                if(GameModel.isFirstPlay()) GameModel.setFirstPlayToFalse()
+            }
+        }
+    }).createMachine({
         id: 'botTurn',
         initial: 'start',
         context: {
@@ -25,10 +42,12 @@ export function createBotMachine(bot: BotPlayer) {
                 ]
             },
             drawingFromDiscardPile: {
-                on: {
-                    OnDrawingFromDiscardPileEnd: {
-                        target: 'UPDATE ME' 
-                    }
+                invoke: {
+                    src: 'drawingFromDiscardPileAnimation',
+                    onDone: {
+                        target: 'canMeld',
+                        actions: () => console.log('drawingFromDiscardPile ended qq')
+                    },
                 }
             },
             drawingFromDeck: {
@@ -54,18 +73,6 @@ export function createBotMachine(bot: BotPlayer) {
             },
             turnEnd: {
                 type: 'final'
-            }
-        }
-    }, 
-    {
-        guards: {
-            isFirstTurn: () => GameModel.isFirstPlay(),
-            isCardOnTopOfDiscardPileUseful: ({context}) => context.bot.isCardOnTopOfDiscardPileUseful(),
-            canMeld: ({context}) => context.bot.canMeld()
-        },
-        actions: {
-            setFirstTurnToFalse: () => {
-                if(GameModel.isFirstPlay()) GameModel.setFirstPlayToFalse()
             }
         }
     })

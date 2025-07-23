@@ -1,11 +1,10 @@
 import { numberOfCardsOnDeck } from "../models/globals"
 
-
-// TODO: make this function async so that we await for it to finish
-// in order to transition to the next state once the animation is done
-export async function drawFromDeckAnimation() {
+export function drawFromDeck() {
+    // TODO programatically deduce orientation and direction
     const hand: HTMLImageElement  = document.querySelector('.card-container-TOP')!
     const tmpImg: HTMLImageElement = document.createElement('img')
+    // TODO programatically deduce if it's vertical or horizontal and
     tmpImg.classList.add('card-HORIZONTAL', 'card-TOP')
     tmpImg.style.visibility = 'hidden'
     hand.appendChild(tmpImg)
@@ -38,7 +37,7 @@ export async function drawFromDeckAnimation() {
 
 
     sourceCard.style.transition = 'all 4s ease'
-    // make it programatically
+    // TODO: make it programatically
     sourceCard.src = './src/assets/cards/2_of_clubs.svg'
 
     requestAnimationFrame(() => {
@@ -46,16 +45,16 @@ export async function drawFromDeckAnimation() {
         sourceCard.style.top = `${relativeTop}px`
     })
 
-    await new Promise<void>((resolve) => {
+    return new Promise<void>((resolve) => {
         sourceCard.addEventListener('transitionend', () => {
-            hand.appendChild(sourceCard); // Mueve el elemento después de la animación
+            hand.appendChild(sourceCard);
             sourceCard.style.left = '';
             sourceCard.style.top = '';
             sourceCard.style.zIndex = '';
             sourceCard.style.position = '';
             sourceCard.style.transition = '';
             sourceCard.classList = 'card-HORIZONTAL card-TOP'
-            // below must be programtically to determine vertical or horizonatl
+            //TODO: below must be programtically to determine vertical or horizonatl
             sourceCard.src = './src/assets/cards/face_down_vertical.svg'
             resolve();
         });
