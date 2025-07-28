@@ -122,7 +122,7 @@ export class BotPlayer extends Player {
                 
                 
     // run if and only if canMeld is true
-    private meld(): void {
+    public meld(): void {
         const suits: Suits = this.assignWeights()
         if(this.findEmptyMeldPile() === null) {
             // handle this case
