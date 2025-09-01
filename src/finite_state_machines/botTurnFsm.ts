@@ -1,4 +1,4 @@
-import { fromPromise, setup } from 'xstate';
+import { assign, fromPromise, setup } from 'xstate';
 import { GameModel } from '../models/Game';
 import { BotPlayer } from '../models/BotPlayer';
 
@@ -7,7 +7,7 @@ import { drawFromDeck } from '../animations/draw_from_deck';
 import { drawfromDiscardPile } from '../animations/draw_from_discard_pile';
 import { meld } from '../animations/meld';
 
-export function createBotMachine(bot: BotPlayer, animationsEnabled: boolean = true) {
+export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,animationsEnabled: boolean = true) {
     return setup({
         actors: {
             drawFromDiscardPileAnimation: fromPromise(async () => {
@@ -25,17 +25,25 @@ export function createBotMachine(bot: BotPlayer, animationsEnabled: boolean = tr
             })
         },
         guards: {
-            isFirstTurn: () => GameModel.isFirstPlay(),
+            isTurnFirst: ({context}) => context.isTheFirstTurn,
             isCardOnTopOfDiscardPileUseful: ({context}) => context.bot.isCardOnTopOfDiscardPileUseful(),
             canMeld: ({context}) => context.bot.canMeld(),
             shouldAnimate: ({context}) => {
-                console.log('shouldAnimate guard evaluated to', context.animationsEnabled)
+                // console.log('shouldAnimate guard evaluated to', context.animationsEnabled)
                 return context.animationsEnabled
             }
         },
         actions: {
-            setFirstTurnToFalse: () => {
-                if(GameModel.isFirstPlay()) GameModel.setFirstPlayToFalse()
+            // should we also execute gameModel.setFirstTurnToFalse() here?
+            setFirstTurnContextToFalse: assign({
+                isTheFirstTurn: (_) => {
+                    console.log('setFirstTurnToFalse action executed')
+                    return false
+                }
+            }),
+            setFirstTurnModelToFalse: (_) => {
+                console.log('setFirstTurnModelToFalse action executed')
+                GameModel.setFirstPlayToFalse()
             },
             drawFromTheDeck: ({context}) => {
                 console.log('action drawFromTheDeck started')
@@ -53,13 +61,14 @@ export function createBotMachine(bot: BotPlayer, animationsEnabled: boolean = tr
     }).createMachine({
         id: 'botTurn',
         initial: 'start',
-        context: {
-            bot,
-            animationsEnabled
-        },
+            context: {
+                bot,
+                animationsEnabled,
+                isTheFirstTurn
+            },
         states: {
             start: {
-                entry: () => console.log('start state entered'),
+                entry: ({context}) => console.log(`start state entered, ${context.currentPlayer}`),
                 description: 'let copilot do it',
                 always: 'determiningIfDiscardedCardIsUseful',
             },
@@ -87,6 +96,7 @@ export function createBotMachine(bot: BotPlayer, animationsEnabled: boolean = tr
                 invoke: {
                     src: 'drawFromDiscardPileAnimation',
                     onDone: {
+                        // target: 'canMeld',
                         target: 'canMeld',
                         actions: () => console.log('drawingFromDiscardPile ended qq')
                     },
@@ -96,8 +106,6 @@ export function createBotMachine(bot: BotPlayer, animationsEnabled: boolean = tr
                 entry: () => console.log('drawingFromDeck state entered'),
 
                 always: [
-                    // if this action doesn't behave as expected, add target: can meld to to other two below
-                    // {actions: 'drawFromTheDeck'},
                     {guard: 'shouldAnimate', actions: 'drawFromTheDeck', target: 'drawingFromDeckAnimation'},
                     {actions: 'drawFromTheDeck', target: 'canMeld'}
                 ]
@@ -157,12 +165,13 @@ export function createBotMachine(bot: BotPlayer, animationsEnabled: boolean = tr
                 }
             },
             isFirstTurn: {
-                entry: () => console.log('isFirstTurn state entered'),
+                entry: ({context}) => console.log(`isFirstTurn state entered, isTheFirstTurn = ${context.isTheFirstTurn}`),
                 always: [
-                    {guard: 'isFirstTurn', actions: 'setFirstTurnToFalse', target: 'drawingFromDeck'},
-                    {actions: 'setFirstTurnToFalse', target: 'turnEnd'}
+                    {guard: 'isTurnFirst', actions: ['setFirstTurnContextToFalse', 'setFirstTurnModelToFalse'], target: 'drawingFromDeck'},
+                    {target: 'turnEnd'}
                 ]
             },
+
             turnEnd: {
                 entry: () => console.log('turnEnd state entered'),
                 type: 'final'

@@ -1,4 +1,4 @@
-import { Actor, createActor , fromPromise, setup, toPromise } from 'xstate';
+import { Actor, assign, createActor , fromPromise, setup, toPromise } from 'xstate';
 import { GameModel } from '../models/Game';
 import { createBotMachine } from './botTurnFsm';
 import { BotPlayer } from '../models/BotPlayer';
@@ -17,13 +17,13 @@ type PlayerAndMachine = {
     machine: ReturnType<typeof createBotMachine>, // Do I need the machine?
 }
 
-function createGameMachine(game: GameModel) {
+export function createGameMachine(game: GameModel) {
 
     const initialPlayer: Player = game.currentPlayer
 
     const botPlayers: PlayerAndMachine[] = []
     
-    const initialPlayerMachine = createBotMachine(initialPlayer as BotPlayer)
+    const initialPlayerMachine = createBotMachine(initialPlayer as BotPlayer, true, false)
 
     const initalPlayerAndMachine: PlayerAndMachine = {
         player: initialPlayer as BotPlayer,
@@ -37,7 +37,7 @@ function createGameMachine(game: GameModel) {
     // botMachines.push(createBotMachine(initialPlayer as BotPlayer))
     for(const botPlayer of game.botPlayersList) {
         if(botPlayer.name === initalPlayerAndMachine.player.name) continue
-        const playerMachine = createBotMachine(botPlayer)
+        const playerMachine = createBotMachine(botPlayer, false, false)
         const PlayerAndMachine: PlayerAndMachine = {
             player: botPlayer as BotPlayer,
             machine: playerMachine
@@ -70,12 +70,11 @@ function createGameMachine(game: GameModel) {
                     context.currentPlayer = context.player4
                     return
                 }
-
             },
         },
         actors: {
             botTurn: fromPromise(async ({input}: {input: any}) => {
-                const currentPlayer = input.bot
+                const currentPlayer = input.botMachine
                 await botPlay(currentPlayer)
             })
         },
@@ -99,36 +98,51 @@ function createGameMachine(game: GameModel) {
         },
         states: {
             start: {
+                entry: () => console.log('start state entered'),
                 always: [
                     {actions: 'setFirstPlayer', target: 'play'}
                 ]
             },
             play: {
+                entry: () => console.log('play state entered'),
                 invoke: {
                     src: 'botTurn',
                     onDone: {
                         target: 'isMatchOver',
-                        actions: () => console.log('turn ended')
+                        actions: assign({ // this is horrible, but we need to do it cause otherwise
+                            // player1 will draw twice on each turn
+                            // Will leave it like this for now
+                            // We could have two machines for the first player, one for the first turn and another for subsequent turns
+                            // and have a first turn boolean in the context of the game machine
+                            // still dont like it but way better than running below on each turn
+                            player1: ({context}) => {
+                                console.log('resetting player1 machine')
+                                const player = context.player1.player
+                                const machine = createBotMachine(player, false, false)
+                                return {player, machine}
+                                },
+                            currentPlayer: ({context}) => context.player1 // reset current player to player1 after each turn
+                            })
                     },
-                    input: {
-                        // this is wrong, we need to send a machine and not an actor
-                        bot: ({context}: { context: { currentPlayer: PlayerAndMachine } }) => context.currentPlayer.machine
-                    },
+                    input: ({context}: { context: { currentPlayer: PlayerAndMachine } }) => ({botMachine: context.currentPlayer.machine})
                     
                 }
             },
             setNextPlayer: {
+                entry: () => console.log('setNextPlayer state entered'),
                 always: [
                     {actions: 'setTheNextPlayer', target: 'play'}
                 ]
             },
             isMatchOver: {
+                entry: () => console.log('isMatchOver state entered'),
                 always: [
                     {guard: 'isTheMatchOver', target: 'matchOver'},
                     {target: 'play'} 
                 ]
             },
             matchOver: {
+                entry: () => console.log('matchOver state entered'),
                 type: "final"
             }
         }

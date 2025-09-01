@@ -48,6 +48,10 @@ export class GameModel {
         for(const player of this._players) {
             if(player.isWinner()) return true
         }
+
+        console.log('Cards left in deck:', this.deck.cardsLeft())
+        if(this.deck.cardsLeft() <= 0) return true
+
         return false
     }
 

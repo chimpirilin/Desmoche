@@ -1,14 +1,19 @@
 import { describe, expect, test } from 'vitest';
-import { Deck } from '../models/Deck';
-import { DiscardPile } from '../models/DiscardPile';
-import { BotPlayer } from '../models/BotPlayer';
-import { Actor } from 'xstate';
+import { Actor, createActor, toPromise } from 'xstate';
+
+import { GameModel } from '../models/Game';
+import { createGameMachine } from './gameFsm';
 
 describe('Bot turn FSM', () => {
     // IMPLEMENT ME
-    test.skip('foo', () => {
-        const deck: Deck = new Deck();
-        const discardPile: DiscardPile = new DiscardPile();
-        const botPlayer: BotPlayer = new BotPlayer(deck, discardPile, 'testBot');
+    test('foo', async () => {
+        const gameModel = new GameModel(4);
+
+        const gameMachine = createGameMachine(gameModel);
+        expect(gameMachine).toBeDefined();
+
+        const gameActor = createActor(gameMachine);
+        gameActor.start();
+        await toPromise(gameActor);
     })
 })
