@@ -14,7 +14,7 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                 await drawfromDiscardPile()
             }),
             drawFromDeckAnimation: fromPromise(async () => {
-                console.log('drawFromDeckAnimation actor started')
+                // console.log('drawFromDeckAnimation actor started')
                 await drawFromDeck()
             }),
             discardAnimation: fromPromise(async () => {
@@ -37,25 +37,25 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
             // should we also execute gameModel.setFirstTurnToFalse() here?
             setFirstTurnContextToFalse: assign({
                 isTheFirstTurn: (_) => {
-                    console.log('setFirstTurnToFalse action executed')
+                    // console.log('setFirstTurnToFalse action executed')
                     return false
                 }
             }),
             setFirstTurnModelToFalse: (_) => {
-                console.log('setFirstTurnModelToFalse action executed')
+                // console.log('setFirstTurnModelToFalse action executed')
                 GameModel.setFirstPlayToFalse()
             },
             drawFromTheDeck: ({context}) => {
-                console.log('action drawFromTheDeck started')
+                // console.log('action drawFromTheDeck started')
                 context.bot.drawFromDeck()
-                console.log('action drawFromTheDeck ended')
+                // console.log('action drawFromTheDeck ended')
             },
             drawfromTheDiscardPile: ({context}) => context.bot.drawFromDiscardPile(),
             meld: ({context}) => context.bot.meld(),
             discard: ({context}) => {
-                console.log('action discard started')
+                // console.log('action discard started')
                 context.bot.discard()
-                console.log('action discard ended')
+                // console.log('action discard ended')
             }
         }
     }).createMachine({
@@ -98,7 +98,7 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                     onDone: {
                         // target: 'canMeld',
                         target: 'canMeld',
-                        actions: () => console.log('drawingFromDiscardPile ended qq')
+                        // actions: () => console.log('drawingFromDiscardPile ended qq')
                     },
                 }
             },
@@ -111,9 +111,9 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                 ]
             },
             drawingFromDeckAnimation: {
-                // entry: () => console.log('drawingFromDeckAnimation state entered'),
+                entry: () => console.log('drawingFromDeckAnimation state entered'),
                 invoke: {
-                    entry: () => console.log('drawingFromDeckAnimation state entered'),
+                    // entry: () => console.log('drawingFromDeckAnimation state entered'),
                     src: 'drawFromDeckAnimation',
                     onDone: {
                         target: 'canMeld',
@@ -137,12 +137,12 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                 ]
             },
             meldingAnimation: {
-                entry: () => console.log('meldingAnimation state entered'),
+                // entry: () => console.log('meldingAnimation state entered'),
                 invoke: {
                     src: 'meldAnimation',
                     onDone: {
                         target: 'discarding',
-                        actions: () => console.log('meldingAnimation ended qq')
+                        // actions: () => console.log('meldingAnimation ended qq')
                     },
                 }
             },
@@ -155,7 +155,7 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                 ]
             },
             discardingAnimation: {
-                entry: () => console.log('discardingAnimation state entered'),
+                // entry: () => console.log('discardingAnimation state entered'),
                 invoke: {
                     src: 'discardAnimation',
                     onDone: {
@@ -165,7 +165,7 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                 }
             },
             isFirstTurn: {
-                entry: ({context}) => console.log(`isFirstTurn state entered, isTheFirstTurn = ${context.isTheFirstTurn}`),
+                // entry: ({context}) => console.log(`isFirstTurn state entered, isTheFirstTurn = ${context.isTheFirstTurn}`),
                 always: [
                     {guard: 'isTurnFirst', actions: ['setFirstTurnContextToFalse', 'setFirstTurnModelToFalse'], target: 'drawingFromDeck'},
                     {target: 'turnEnd'}

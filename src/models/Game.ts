@@ -7,7 +7,6 @@ import { Player } from "./Player"
 export class GameModel {
     private botPlayers: BotPlayer[] = []
     // private humanPlayer: HumanPlayer
-    private humanPlayer: HumanPlayer
     private _players: Player[]
     private deck: Deck
     private discardPile: DiscardPile
@@ -20,7 +19,7 @@ export class GameModel {
         this.deck = new Deck()
         this.discardPile = new DiscardPile()
         
-        this.humanPlayer = new HumanPlayer(this.deck, this.discardPile, 'Human')
+        // this.humanPlayer = new HumanPlayer(this.deck, this.discardPile, 'Human')
         // we substract one because we don't count the human player
         // Rememeber to substract one wehn when we finish human player
         for(let i = 0; i < this.playerCount; i++) {

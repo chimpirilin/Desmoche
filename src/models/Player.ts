@@ -3,7 +3,14 @@ import { Deck } from "./Deck";
 import { DiscardPile } from "./DiscardPile";
 import { MeldPile } from "./MeldPile";
 
-import { INITIAL_HAND_SIZE, MELD_PILES_SIZE } from "./constants";
+function cardToString(card: Card): string {
+    if(card.suit === HEART) return `♥${card.rank}`
+    if(card.suit === DIAMOND) return `♦${card.rank}`
+    if(card.suit === SPADE) return `♠${card.rank}`
+    return `♣${card.rank}`
+}
+
+import { DECK_COMPONENTS, DIAMOND, HEART, INITIAL_HAND_SIZE, MELD_PILES_SIZE, SPADE } from "./constants";
 //TODO: revise public methods to be private or protected
 export abstract class Player {
     private _hand: Card[] = []
@@ -16,8 +23,7 @@ export abstract class Player {
 
         for(let i = 0; i < MELD_PILES_SIZE; i++) {
             this._meldPiles.push(new MeldPile());
-        }
-            
+        }            
     }
 
     private set isFirstTurn(value: boolean) {
@@ -40,6 +46,8 @@ export abstract class Player {
             throw new Error('Cannot draw, deck is empty!');
         }
         this.addToHand(this.deck.getRandomCardAndRemoveItFromDeck());
+        console.log(`${this._name} drew a card from the deck.`)
+        console.log(`There are ${this.deck.cardsLeft()} cards left in the deck.`)
     }
 
     public addToHand(card: Card): void {
@@ -61,6 +69,19 @@ export abstract class Player {
 
     public receiveCard(card: Card): void {
         this.addToHand(card);
+    }
+
+    public cardsInHand(): string {
+        const cardStrings = this._hand.map(card => cardToString(card));
+        return cardStrings.join('| ');
+    }
+
+    public cardsInMeldPiles(): string {
+        const piles = this._meldPiles.map((pile, index) => {
+            const cardStrings = pile.pile.map(card => cardToString(card));
+            return `Pile ${index + 1}: ${cardStrings.join('| ')}`;
+        });
+        return piles.join('\n');
     }
 
     public isWinner(): boolean {

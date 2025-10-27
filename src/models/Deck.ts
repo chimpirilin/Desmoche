@@ -14,6 +14,7 @@ export class Deck {
                 this.deck.push({ suit, rank, weight: Infinity })
             }
         }
+        console.log('Deck created with', this.deck.length, 'cards.')
     }
 
     public getRandomCardAndRemoveItFromDeck(): Card {

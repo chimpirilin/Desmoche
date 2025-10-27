@@ -50,27 +50,38 @@ export function createGameMachine(game: GameModel) {
             setFirstPlayer: ({ context }) => {
                 context.currentPlayer = context.player1
             },
-            setTheNextPlayer: ({ context }) => {
-                const nextPlayer = context.game.nextPlayer()
+            setTheNextPlayer: assign(({context}) => {
+                const nextPlayer = game.nextPlayer()
+                
+                console.log(`current player was: ${context.currentPlayer.player.name}`)
+                console.log(`Determining next player: ${nextPlayer.name}`)
 
                 // player1.player, yikes!
                 if(nextPlayer.name === context.player1.player.name) {
-                    context.currentPlayer = context.player1
-                    return
+                    console.log(`Next player is: ${context.player1.player.name}`);
+                    return {
+                        currentPlayer: context.player1
+                    }
                 }
                 if(nextPlayer.name === context.player2.player.name) {
-                    context.currentPlayer = context.player2
-                    return
+                    console.log(`Next player is: ${context.player2.player.name}`);
+                    return {
+                        currentPlayer: context.player2
+                    }
                 }
                 if(nextPlayer.name === context.player3.player.name) {
-                    context.currentPlayer = context.player3
-                    return
+                    console.log(`Next player is: ${context.player3.player.name}`);
+                    return {
+                        currentPlayer: context.player3
+                    }
                 }
                 if(nextPlayer.name === context.player4.player.name) {
-                    context.currentPlayer = context.player4
-                    return
+                    console.log(`Next player is: ${context.player4.player.name}`);
+                    return {
+                        currentPlayer: context.player4
+                    }
                 }
-            },
+            }),
         },
         actors: {
             botTurn: fromPromise(async ({input}: {input: any}) => {
@@ -121,7 +132,7 @@ export function createGameMachine(game: GameModel) {
                                 const machine = createBotMachine(player, false, false)
                                 return {player, machine}
                                 },
-                            currentPlayer: ({context}) => context.player1 // reset current player to player1 after each turn
+                            // currentPlayer: ({context}) => context.player1 // reset current player to player1 after each turn
                             })
                     },
                     input: ({context}: { context: { currentPlayer: PlayerAndMachine } }) => ({botMachine: context.currentPlayer.machine})
@@ -138,7 +149,7 @@ export function createGameMachine(game: GameModel) {
                 entry: () => console.log('isMatchOver state entered'),
                 always: [
                     {guard: 'isTheMatchOver', target: 'matchOver'},
-                    {target: 'play'} 
+                    {target: 'setNextPlayer'} 
                 ]
             },
             matchOver: {

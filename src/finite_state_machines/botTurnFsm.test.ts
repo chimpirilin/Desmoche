@@ -6,12 +6,6 @@ import { BotPlayer } from "../models/BotPlayer"
 import { Deck } from "../models/Deck"
 import { DiscardPile } from "../models/DiscardPile"
 
-// beforeAll(() => {
-//     vi.setConfig({ testTimeout: 20000 }) // 20 seconds
-// });
-
-
-// FIX ME - weird behaviour when running this test, works fine first time, it gets stuck in subsequent runs
 describe('Bot turn FSM', () => {
 
     let machineActor: Actor<any> ;
