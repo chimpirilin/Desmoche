@@ -1,6 +1,7 @@
 import { numberOfCardsOnDeck } from "../models/globals"
 
 export function drawFromDeck() {
+    console.log('drawFromDeck animation started')
     // TODO programatically deduce orientation and direction
     const hand: HTMLImageElement  = document.querySelector('.card-container-TOP')!
     const tmpImg: HTMLImageElement = document.createElement('img')
@@ -16,6 +17,7 @@ export function drawFromDeck() {
     const deck: HTMLImageElement = document.querySelector('.deck-container')!
     
     // top card of the deck is the source
+    // this is wrong because if we draw multiple cards, the number of cards must decrease
     const sourceCard: HTMLImageElement = deck.querySelector(`#deck-card-${numberOfCardsOnDeck}`)! as HTMLImageElement
 
     sourceCard.style.position = 'absolute';
@@ -36,7 +38,7 @@ export function drawFromDeck() {
  
 
 
-    sourceCard.style.transition = 'all 4s ease'
+    sourceCard.style.transition = 'all 1s ease'
     // TODO: make it programatically
     sourceCard.src = './src/assets/cards/2_of_clubs.svg'
 
@@ -56,6 +58,8 @@ export function drawFromDeck() {
             sourceCard.classList = 'card-HORIZONTAL card-TOP'
             //TODO: below must be programtically to determine vertical or horizonatl
             sourceCard.src = './src/assets/cards/face_down_vertical.svg'
+            // wait 1 second after animation finishes before resolving
+            // setTimeout(() => resolve(), 500);
             resolve();
         });
     });
