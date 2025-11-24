@@ -19,6 +19,7 @@ export class DiscardPile {
 
     public getTopCard(): Card {
         if(this.isPileEmpty()) {
+            // do I really need to throw here?
             throw new Error('Cannot retrieve top card, pile is empty!')
         }
         return this.pile[this.pile.length - 1]

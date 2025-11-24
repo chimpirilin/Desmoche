@@ -1,6 +1,8 @@
+import { Card } from "../models/Card"
 import { numberOfCardsOnDeck } from "../models/globals"
+import { nameOfCardImage } from "./helper"
 
-export function drawFromDeck() {
+export function drawFromDeck(drawnCard: Card) {
     console.log('drawFromDeck animation started')
     // TODO programatically deduce orientation and direction
     const hand: HTMLImageElement  = document.querySelector('.card-container-TOP')!
@@ -37,10 +39,10 @@ export function drawFromDeck() {
      sourceCard.style.top = `${sourceRect.top - ancestorRect.top}px`;
  
 
-
     sourceCard.style.transition = 'all 1s ease'
-    // TODO: make it programatically
-    sourceCard.src = './src/assets/cards/2_of_clubs.svg'
+    sourceCard.src = nameOfCardImage(drawnCard)
+
+    console.log(`drawing card animation started for ${nameOfCardImage(drawnCard)}`);
 
     requestAnimationFrame(() => {
         sourceCard.style.left = `${relativeLeft}px`
@@ -59,8 +61,7 @@ export function drawFromDeck() {
             //TODO: below must be programtically to determine vertical or horizonatl
             sourceCard.src = './src/assets/cards/face_down_vertical.svg'
             // wait 1 second after animation finishes before resolving
-            // setTimeout(() => resolve(), 500);
-            resolve();
+            setTimeout(() => resolve(), 1500);
         });
     });
 }

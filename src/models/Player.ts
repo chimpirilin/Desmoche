@@ -17,6 +17,7 @@ export abstract class Player {
     private _meldPiles: MeldPile[] = []
     private _isFirstTurn: boolean = false
     private _isFirstPlayer: boolean = false
+    private _drawnCardThisTurn: Card | null = null
 
     constructor(private deck: Deck, protected discardPile : DiscardPile, private _name: string = 'Player') {
         this.initializeHand();
@@ -45,7 +46,9 @@ export abstract class Player {
             // we probably want to emit an event instead of throwing
             throw new Error('Cannot draw, deck is empty!');
         }
-        this.addToHand(this.deck.getRandomCardAndRemoveItFromDeck());
+        const drawnCard = this.deck.getRandomCardAndRemoveItFromDeck();
+        this.addToHand(drawnCard);
+        this._drawnCardThisTurn = drawnCard;
         console.log(`${this._name} drew a card from the deck.`)
         console.log(`There are ${this.deck.cardsLeft()} cards left in the deck.`)
     }
@@ -100,5 +103,13 @@ export abstract class Player {
 
     get meldPiles(): MeldPile[] {
         return this._meldPiles;
+    }
+
+    get topOfDiscardPile(): Card {
+        return this.discardPile.getTopCard()
+    }
+
+    get drawnCardThisTurn(): Card | null {
+        return this._drawnCardThisTurn;
     }
 }

@@ -61,7 +61,7 @@ export async function meld(count: number, fromPosition: string = 'TOP', toPositi
                 // keep classes consistent (adjust if you track orientation)
                 sourceCard.classList = 'card-HORIZONTAL card-TOP';
                 // small pause after each card finishes to create visible stagger
-                setTimeout(() => resolve(), 80);
+                setTimeout(() => resolve(), 1500);
             };
             sourceCard.addEventListener('transitionend', onEnd);
 

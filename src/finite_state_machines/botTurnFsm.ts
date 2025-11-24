@@ -6,22 +6,32 @@ import { discard } from '../animations/discard';
 import { drawFromDeck } from '../animations/draw_from_deck';
 import { drawfromDiscardPile } from '../animations/draw_from_discard_pile';
 import { meld } from '../animations/meld';
+import { decreaseNumberOfCardsOnDeck } from '../models/globals';
 
-export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,animationsEnabled: boolean = true) {
+export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true, animationsEnabled: boolean = true) {
+    console.log(`Creating bot machine for player: ${bot.name}`);
+    console.log(`animationsEnabled in createBotMachine: ${animationsEnabled}`);
     return setup({
         actors: {
             drawFromDiscardPileAnimation: fromPromise(async () => {
                 await drawfromDiscardPile()
             }),
-            drawFromDeckAnimation: fromPromise(async () => {
+            drawFromDeckAnimation: fromPromise(async ({input}: any) => {
                 // console.log('drawFromDeckAnimation actor started')
-                await drawFromDeck()
+                const currentPlayer = input.bot;
+                const drawnCard = currentPlayer.drawnCardThisTurn;
+                await drawFromDeck(drawnCard)
+                decreaseNumberOfCardsOnDeck();
             }),
-            discardAnimation: fromPromise(async () => {
-                await discard()
+            discardAnimation: fromPromise(async ({input}: {input: any}) => {
+                const currentPlayer = input.bot;
+                const topOfDiscardPile = currentPlayer.topOfDiscardPile
+                await discard(topOfDiscardPile)
             }),
-            meldAnimation: fromPromise(async () => {
-                await meld()
+            meldAnimation: fromPromise(async ({input}: {input: any}) => {
+                const currentPlayer = input.bot;
+                console.log(`meldAnimation actor started for player ${currentPlayer.name}`);
+                await meld(3)
             })
         },
         guards: {
@@ -29,7 +39,7 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
             isCardOnTopOfDiscardPileUseful: ({context}) => context.bot.isCardOnTopOfDiscardPileUseful(),
             canMeld: ({context}) => context.bot.canMeld(),
             shouldAnimate: ({context}) => {
-                // console.log('shouldAnimate guard evaluated to', context.animationsEnabled)
+                console.log('shouldAnimate guard evaluated to', context.animationsEnabled)
                 return context.animationsEnabled
             }
         },
@@ -46,12 +56,20 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                 GameModel.setFirstPlayToFalse()
             },
             drawFromTheDeck: ({context}) => {
-                // console.log('action drawFromTheDeck started')
+                console.log('action drawFromTheDeck started')
                 context.bot.drawFromDeck()
-                // console.log('action drawFromTheDeck ended')
+                console.log('action drawFromTheDeck ended')
             },
-            drawfromTheDiscardPile: ({context}) => context.bot.drawFromDiscardPile(),
-            meld: ({context}) => context.bot.meld(),
+            drawfromTheDiscardPile: ({context}) => {
+                console.log('action drawfromTheDiscardPile started')
+                context.bot.drawFromDiscardPile()
+                console.log('action drawfromTheDiscardPile ended')
+            },
+            meld: ({context}) => {
+                console.log('action meld started')
+                context.bot.meld(),
+                console.log('action meld ended')
+            },
             discard: ({context}) => {
                 // console.log('action discard started')
                 context.bot.discard()
@@ -68,7 +86,7 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
             },
         states: {
             start: {
-                entry: ({context}) => console.log(`start state entered, ${context.currentPlayer}`),
+                entry: () => console.log(`bot turn start state entered, bot is ${bot.name}`),
                 description: 'let copilot do it',
                 always: 'determiningIfDiscardedCardIsUseful',
             },
@@ -78,17 +96,15 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                     // we probably need an action to be performed if it's the first play of the game
                     // it will just set firstPlay to false
                     // dont forget to add that later
-                    {guard: 'isCardOnTopOfDiscardPileUseful', target: 'drawingFromDiscardPileAnimation'},
+                    {guard: 'isCardOnTopOfDiscardPileUseful', target: 'drawingFromDiscardPile'},
                     {target: 'drawingFromDeck'}
                 ]
             },
             drawingFromDiscardPile: {
                 entry: () => console.log('drawingFromDiscardPile state entered'),
                 always: [
-                    // if this action doesn't behave as expected, add target: can meld to to other two below
-                    {actions: 'drawfromTheDiscardPile'},
-                    {guard: 'shouldAnimate', target: 'drawingFromDiscardPileAnimation'},
-                    {target: 'canMeld'}
+                    {guard: 'shouldAnimate', actions: 'drawfromTheDiscardPile', target: 'drawingFromDiscardPileAnimation'},
+                    {actions: 'drawfromTheDiscardPile', target: 'canMeld'}
                 ]
             },
             drawingFromDiscardPileAnimation: {
@@ -119,6 +135,7 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                         target: 'canMeld',
                         actions: () => console.log('drawingFromDeckAnimation ended qq')
                     },
+                    input: ({context}: { context: { bot: BotPlayer } }) => ({bot: context.bot})
                 }
             },
             canMeld: {
@@ -144,6 +161,7 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                         target: 'discarding',
                         // actions: () => console.log('meldingAnimation ended qq')
                     },
+                    input: ({context}: { context: { bot: BotPlayer } }) => ({bot: context.bot})
                 }
             },
             discarding: {
@@ -162,6 +180,8 @@ export function createBotMachine(bot: BotPlayer, isTheFirstTurn: boolean = true,
                         target: 'isFirstTurn',
                         actions: () => console.log('discardingAnimations ended qq')
                     },
+                    input: ({context}: { context: { bot: BotPlayer } }) => ({bot: context.bot})
+
                 }
             },
             isFirstTurn: {

@@ -17,13 +17,13 @@ type PlayerAndMachine = {
     machine: ReturnType<typeof createBotMachine>, // Do I need the machine?
 }
 
-export function createGameMachine(game: GameModel) {
+export function createGameMachine(game: GameModel, animationsEnabled: boolean = true) {
 
     const initialPlayer: Player = game.currentPlayer
 
     const botPlayers: PlayerAndMachine[] = []
     
-    const initialPlayerMachine = createBotMachine(initialPlayer as BotPlayer, true, false)
+    const initialPlayerMachine = createBotMachine(initialPlayer as BotPlayer, true, animationsEnabled)
 
     const initalPlayerAndMachine: PlayerAndMachine = {
         player: initialPlayer as BotPlayer,
@@ -37,7 +37,7 @@ export function createGameMachine(game: GameModel) {
     // botMachines.push(createBotMachine(initialPlayer as BotPlayer))
     for(const botPlayer of game.botPlayersList) {
         if(botPlayer.name === initalPlayerAndMachine.player.name) continue
-        const playerMachine = createBotMachine(botPlayer, false, false)
+        const playerMachine = createBotMachine(botPlayer, false, animationsEnabled)
         const PlayerAndMachine: PlayerAndMachine = {
             player: botPlayer as BotPlayer,
             machine: playerMachine
@@ -109,13 +109,13 @@ export function createGameMachine(game: GameModel) {
         },
         states: {
             start: {
-                entry: () => console.log('start state entered'),
+                entry: () => console.log(`game start state entered`),
                 always: [
                     {actions: 'setFirstPlayer', target: 'play'}
                 ]
             },
             play: {
-                entry: () => console.log('play state entered'),
+                entry: () => console.log(`game play state entered, bot to play is ${game.currentPlayer.name}`),
                 invoke: {
                     src: 'botTurn',
                     onDone: {
@@ -129,7 +129,7 @@ export function createGameMachine(game: GameModel) {
                             player1: ({context}) => {
                                 console.log('resetting player1 machine')
                                 const player = context.player1.player
-                                const machine = createBotMachine(player, false, false)
+                                const machine = createBotMachine(player, false, animationsEnabled)
                                 return {player, machine}
                                 },
                             // currentPlayer: ({context}) => context.player1 // reset current player to player1 after each turn

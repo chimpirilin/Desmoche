@@ -1,6 +1,13 @@
 :root {
-    --card-width: 66px;
-    --card-height: 100px;
+    /* Responsive card sizing
+       - Width will scale with viewport but is clamped to sensible min/max values.
+       - Height is derived from the original card aspect (94 / 60 = 1.56666...).
+       - You can tweak the clamp() values to change how large cards get on different screens. */
+    --card-width: clamp(25px, 6.5vw, 75px);
+    --card-height: calc(var(--card-width) * 1.48);
+    /* Grid template variables (can be overridden in media queries) */
+    --game-grid-cols: 1% 10% 19% 40% 19% 10% 1%;
+    --game-grid-rows: 1% 15% 18% 30% 18% 15% 1%;
 }
 
 .background {
@@ -12,14 +19,42 @@
 
 .game-area {
     display: grid;
-    grid-template-columns: 10% 15% 50% 15% 10%;
-    grid-template-rows: 15% 15% 40% 15% 15%;
+    /* Use variables so breakpoints can override templates */
+    grid-template-columns: var(--game-grid-cols);
+    grid-template-rows: var(--game-grid-rows);
     position: absolute;
     top: 5%;
     left: 5%;
     width: 90%;
     height: 90%;
     border: 2px solid #ffffff;
+}
+
+/* Responsive breakpoints: override the grid-template variables for different viewports */
+@media (max-width: 1024px) {
+    :root {
+        /* Tablet-ish layout: slightly larger gutters and adjusted rows */
+        --game-grid-cols: 2% 12% 22% 40% 22% 12% 2%;
+        --game-grid-rows: 2% 12% 16% 40% 16% 12% 2%;
+    }
+}
+
+@media (max-width: 600px) {
+    :root {
+        /* Mobile compact layout: main content centered, smaller gutters */
+        --game-grid-cols: 4% 92% 4%;
+        --game-grid-rows: 4% 18% 18% 40% 10% 8% 2%;
+    }
+
+    /* Adjust left/right stacked containers for narrow screens */
+    .card-container-LEFT {
+        margin-left: 0;
+        align-items: center;
+    }
+    .card-container-RIGHT {
+        margin-right: 0;
+        align-items: center;
+    }
 }
 
 .card-container-TOP {
@@ -59,13 +94,15 @@
 .card-VERTICAL {
     height: var(--card-height);
     width: var(--card-width);
-    margin-bottom: -70px;
+    /* overlap amount as a proportion of card height so it scales */
+    margin-bottom: calc(-0.8 * var(--card-height));
 }
 
 .card-HORIZONTAL {
     height: var(--card-height);
     width: var(--card-width);
-    margin-right: -30px;
+    /* overlap amount as a proportion of card width so it scales */
+    margin-right: calc(-0.6 * var(--card-width));
 }
 
 .card:last-child {
@@ -88,6 +125,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    column-gap: 5%;
 }
 
 .meld-pile-container-BOTTOM {
@@ -95,13 +133,16 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    column-gap: 5%;
 }
 
 .meld-pile-container-LEFT {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-left: 20%;   
+    margin-left: 20%;  
+    justify-content: center;
+    row-gap: 5%;
 }
 
 .meld-pile-container-RIGHT {
@@ -109,21 +150,23 @@
     flex-direction: column;
     align-items: flex-end;
     margin-right: 20%;   
+    justify-content: center;
+    row-gap: 5%;
 }
 .meld-pile-HORIZONTAL {
     height: var(--card-height);
     width: var(--card-width);
     border: 2px solid white;
-    margin-right: 60px;
+    /* margin-right: 60px; */
     background: linear-gradient(to bottom, #0d8022 0%, #0d8055 76%);
 }
 
 .meld-pile-VERTICAL {
-    height: var(--card-height);
-    width: var(--card-width);
+    width: var(--card-height);
+    height: var(--card-width);
     border: 2px solid white;
     background: linear-gradient(to bottom, #0d8022 0%, #0d8055 76%); /*add it as a variable*/
-    transform: rotate(90deg);
+    /* transform: rotate(90deg); */
 }
 
 .meld-pile-HORIZONTAL:last-child {
@@ -135,7 +178,7 @@
     display: flex;
     flex-direction: row;
     top: 30%;
-    left: 55%;
+    left: 60%;
     /* align-items: center;
     justify-content: center; */
 }
@@ -152,7 +195,9 @@
     height: var(--card-height);
     width: var(--card-width);
     top: 30%;
-    left: 40%;
+    left: 20%;
     border: 2px solid white;
     background: radial-gradient(circle,rgba(13, 128, 0, 1) 0%, rgba(13, 128, 119, 0.86) 100%);
+    display: flex;
+    flex-direction: row;
 }

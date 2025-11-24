@@ -9,7 +9,7 @@ describe('Bot turn FSM', () => {
     test('foo', async () => {
         const gameModel = new GameModel(4);
 
-        const gameMachine = createGameMachine(gameModel);
+        const gameMachine = createGameMachine(gameModel, false);
         expect(gameMachine).toBeDefined();
 
         const gameActor = createActor(gameMachine);

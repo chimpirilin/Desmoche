@@ -1,5 +1,7 @@
-// IMPLEMENT ME
-export async function discard(): Promise<void> {
+import { Card } from "../models/Card";
+import { nameOfCardImage } from "./helper";
+
+export async function discard(topOfPile: Card): Promise<void> {
     const hand = document.querySelector('.card-container-TOP') as HTMLElement | null;
     const discardContainer = document.querySelector('.discard-pile') as HTMLElement | null;
 
@@ -38,7 +40,9 @@ export async function discard(): Promise<void> {
     // trigger layout then animate
     // use a short transition; adjust duration as needed
     sourceCard.style.transition = 'all 4s ease'
-    sourceCard.src = './src/assets/cards/2_of_clubs.svg'
+    sourceCard.src = nameOfCardImage(topOfPile)
+
+    console.log(`discarding card animation started for ${nameOfCardImage(topOfPile)}`);
 
     // ensure next frame before changing values
     await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
@@ -49,15 +53,16 @@ export async function discard(): Promise<void> {
             // move to discard container
             discardContainer.appendChild(sourceCard);
             // cleanup inline styles
-            sourceCard.style.left = '';
-            sourceCard.style.top = '';
-            sourceCard.style.zIndex = '';
-            sourceCard.style.position = '';
+            sourceCard.style.left = '0px';
+            sourceCard.style.top = '0px';
+            sourceCard.style.zIndex = '1';
+            // sourceCard.classList.remove('card-HORIZONTAL');
+            // sourceCard.style.position = '';
             sourceCard.style.transition = '';
-            // set classes appropriately (adjust as needed)
-            sourceCard.classList = 'card-HORIZONTAL card-TOP';
+            // set cslasses appropriately (adjust as needed)
+            // sourceCard.classList = 'card-HORIZONTAL card-TOP';
             // wait 1 second after animation finishes before resolving
-            setTimeout(() => resolve(), 1000);
+            setTimeout(() => resolve(), 1500);
         };
 
         sourceCard.addEventListener('transitionend', onEnd);
